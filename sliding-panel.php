@@ -4,7 +4,7 @@
  * Plugin URI:  https://github.com/millaw/sliding-panel
  * Description: A lightweight, customizable sliding panel for WordPress to replace ClientEngage UberPanel.
  * Version: 1.0
- * Author: Your Name
+ * Author: Milla Wynn
  * Author URI: https://github.com/millaw
  * License: GPL2
  */
