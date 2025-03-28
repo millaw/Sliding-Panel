@@ -1,0 +1,116 @@
+/* Base Panel Styles */
+#mw-sliding-panel {
+    position: fixed;
+    top: 30%;
+    width: var(--panel-width);
+    z-index: 99999;
+    transition: transform 0.3s ease-out;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+/* Position Variations */
+#mw-sliding-panel.mw-position-right {
+    right: calc(-1 * var(--panel-width));
+    transform: translateX(0);
+}
+
+#mw-sliding-panel.mw-position-left {
+    left: calc(-1 * var(--panel-width));
+    transform: translateX(0);
+}
+
+#mw-sliding-panel.mw-position-right.open {
+    transform: translateX(calc(-1 * var(--panel-width)));
+}
+
+#mw-sliding-panel.mw-position-left.open {
+    transform: translateX(var(--panel-width));
+}
+
+/* Panel Content */
+.mw-panel-content {
+    position: relative;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    height: auto;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Panel Tab */
+.mw-panel-tab {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: left center;
+    background: var(--tab-color);
+    color: white;
+    padding: 12px 18px;
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mw-position-right .mw-panel-tab {
+    left: calc(-1 * (18px + 1.5em));
+}
+
+.mw-position-left .mw-panel-tab {
+    right: calc(-1 * (18px + 1.5em));
+    left: auto;
+    transform: translateY(-50%) rotate(90deg);
+    transform-origin: right center;
+}
+
+.mw-panel-tab:hover {
+    filter: brightness(0.9);
+}
+
+/* Close Button */
+.mw-panel-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mw-panel-close:hover {
+    color: #222;
+}
+
+/* Responsive Design */
+@media (max-width: 782px) {
+    #mw-sliding-panel {
+        width: 300px !important;
+    }
+    
+    #mw-sliding-panel.mw-position-right {
+        right: -300px;
+    }
+    
+    #mw-sliding-panel.mw-position-left {
+        left: -300px;
+    }
+    
+    .mw-panel-tab {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
