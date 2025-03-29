@@ -3,7 +3,7 @@
 Plugin Name: MW Sliding Panel
 Plugin URI: https://github.com/millaw/mw-sliding-panel
 Description: A fully functional lightweight sliding panel for WordPress.
-Version: 1.0.3
+Version: 1.0.4
 Author: Milla Wynn
 Author URI: https://github.com/millaw
 License: GPL2
@@ -25,19 +25,20 @@ class MW_Sliding_Panel {
 
     private function __construct() {
         // Frontend hooks
-        add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
         add_action('wp_footer', [$this, 'render_panel']);
         
         // Admin hooks
         add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_menu', [$this, 'add_admin_page']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'add_settings_link']);
         
         // Widget area
         add_action('widgets_init', [$this, 'register_widget_area']);
     }
 
-    public function enqueue_assets() {
+    public function enqueue_frontend_assets() {
         // Frontend CSS
         wp_enqueue_style(
             'mw-sliding-panel-frontend',
@@ -46,7 +47,7 @@ class MW_Sliding_Panel {
             filemtime(plugin_dir_path(__FILE__) . 'assets/css/frontend.css')
         );
 
-        // Frontend JS
+        // Frontend JS - only jQuery as dependency
         wp_enqueue_script(
             'mw-sliding-panel-frontend',
             plugins_url('assets/js/frontend.js', __FILE__),
@@ -54,6 +55,29 @@ class MW_Sliding_Panel {
             filemtime(plugin_dir_path(__FILE__) . 'assets/js/frontend.js'),
             true
         );
+    }
+
+    public function enqueue_admin_assets($hook) {
+        // Only load on our plugin's settings page
+        if ('settings_page_mw-sliding-panel' !== $hook) {
+            return;
+        }
+        
+        // Enqueue color picker
+        wp_enqueue_style('wp-color-picker');
+        
+        // Enqueue admin JS with proper dependencies
+        wp_enqueue_script(
+            'mw-sliding-panel-admin',
+            plugins_url('assets/js/admin.js', __FILE__),
+            ['jquery', 'wp-color-picker'], // Correct dependencies
+            filemtime(plugin_dir_path(__FILE__) . 'assets/js/admin.js'),
+            true
+        );
+        
+        // Remove any conflicting editor scripts
+        wp_dequeue_script('wp-editor');
+        wp_deregister_script('wp-editor');
     }
 
     public function render_panel() {
@@ -76,6 +100,9 @@ class MW_Sliding_Panel {
     }
 
     public function register_widget_area() {
+        // Disable block editor for widgets to prevent conflicts
+        add_filter('use_widgets_block_editor', '__return_false');
+        
         register_sidebar([
             'name'          => __('Sliding Panel Content', 'mw-sliding-panel'),
             'id'            => 'mw-sliding-panel',
@@ -105,14 +132,6 @@ class MW_Sliding_Panel {
     }
 
     public function render_admin_page() {
-        wp_enqueue_style('wp-color-picker');
-        wp_enqueue_script(
-            'mw-sliding-panel-admin',
-            plugins_url('assets/js/admin.js', __FILE__),
-            ['wp-color-picker'],
-            filemtime(plugin_dir_path(__FILE__) . 'assets/js/admin.js'),
-            true
-        );
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('Sliding Panel Settings', 'mw-sliding-panel'); ?></h1>
@@ -185,4 +204,7 @@ function mw_sliding_panel_uninstall() {
     if (is_active_sidebar('mw-sliding-panel')) {
         unregister_sidebar('mw-sliding-panel');
     }
+    
+    // Clean up any transients
+    delete_transient('mw_sliding_panel_transient');
 }
